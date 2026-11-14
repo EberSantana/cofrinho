@@ -1,4 +1,4 @@
-# 🐷 Cofrinho · Cofre 2027
+# Cofrinho
 
 Sistema web de economia no formato de **desafio de cartela**: o usuário define uma meta (padrão **R$ 40.000 em 2027**) e marca cada quadrado ao guardar o valor correspondente, acompanhando o progresso em tempo real.
 
@@ -15,6 +15,7 @@ Sistema web de economia no formato de **desafio de cartela**: o usuário define 
 - **Marcos de progresso**: 10%, 25%, 50%, 75% e 100%.
 - **Depósitos extras**: registro de valores fora da cartela (13º, bônus, vendas), com histórico.
 - **Configuração livre**: meta, data de início, data final e modelo.
+- **Backup**: exportação e importação dos dados em arquivo JSON.
 - **Tema claro e escuro** automáticos e layout responsivo para celular.
 
 ## Como usar
@@ -26,7 +27,7 @@ Sistema web de economia no formato de **desafio de cartela**: o usuário define 
 
 ## Privacidade
 
-Todos os dados ficam **apenas no navegador** do usuário (`localStorage`). Nada é enviado a servidores. Limpar os dados do navegador apaga o progresso.
+Todos os dados ficam **apenas no navegador** do usuário (`localStorage`). Nada é enviado a servidores. Limpar os dados do navegador apaga o progresso; por isso há exportação e importação de backup.
 
 ## Tecnologia
 

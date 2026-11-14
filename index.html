@@ -3,7 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cofre 2027</title>
+<title>Cofrinho · Desafio de economia</title>
+<meta name="description" content="Desafio de economia em cartela: defina sua meta, marque cada depósito e acompanhe seu progresso. Gratuito, sem cadastro, dados só no seu dispositivo.">
+<meta name="theme-color" content="#0f6b47">
+<meta property="og:title" content="Cofrinho · Desafio de economia">
+<meta property="og:description" content="Defina sua meta, marque cada depósito na cartela e acompanhe o ritmo até o fim do prazo.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f6b47'/%3E%3Ccircle cx='32' cy='32' r='16' fill='none' stroke='%23fff' stroke-width='5'/%3E%3Cpath d='M32 22v20M26 28h9a4 4 0 010 8h-9' fill='none' stroke='%23fff' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -27,19 +33,28 @@
   --accent:#4cc58f; --accent-ink:#06150e; --accent-soft:#183326; --mark:#ff7a6b; --mark-soft:#3a1d1a;
   color-scheme:dark;
 }
+.brand{display:flex;gap:14px;align-items:center}
+.logo{width:48px;height:48px;color:var(--accent);flex:none}
+.card,.tile{box-shadow:0 1px 2px rgba(20,35,27,.05)}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:16px;font-size:13px;color:var(--muted)}
+.foot a{color:var(--accent);font-weight:600}
+.foot .acts{display:flex;gap:8px}
+.btn.sm{padding:7px 12px;font-size:13px}
+.skip{position:absolute;left:-999px;top:8px;background:var(--accent);color:var(--accent-ink);padding:8px 12px;border-radius:8px;z-index:9}
+.skip:focus{left:8px}
+@media print{.foot .acts,#cfgForm,#exForm{display:none}body{background:#fff}}
 *{box-sizing:border-box}
 html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
 .wrap{max-width:960px;margin:0 auto;padding:24px 16px 64px;display:flex;flex-direction:column;gap:20px}
 h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.01em}
 h1{font-size:clamp(30px,6vw,44px);line-height:1.05;font-weight:800}
-h1 .yr{color:var(--mark);text-decoration:underline;text-decoration-thickness:3px;text-underline-offset:6px;text-decoration-style:wavy}
 h2{font-size:20px;font-weight:700}
 .top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
 .sub{color:var(--muted);margin:6px 0 0;max-width:60ch}
 .sync{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}
 .sync i{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block}
-.sync.off i{background:var(--muted)}
+
 .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
 .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .tile{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:2px;min-width:0}
@@ -102,16 +117,20 @@ input:focus,select:focus{border-color:var(--accent);outline:none}
 </style>
 </head>
 <body>
+<a class="skip" href="#grid">Ir para a cartela</a>
 <main class="wrap">
   <header class="top">
-    <div>
-      <h1>Cofre <span class="yr">2027</span></h1>
-      <p class="sub">Marque cada quadrado quando guardar o valor. A meta chega sozinha, um depósito de cada vez.</p>
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="currentColor"/><circle cx="32" cy="32" r="16" fill="none" stroke="var(--accent-ink)" stroke-width="5"/><path d="M32 22v20M26 28h9a4 4 0 010 8h-9" fill="none" stroke="var(--accent-ink)" stroke-width="4" stroke-linecap="round"/></svg>
+      <div>
+        <h1>Cofrinho</h1>
+        <p class="sub">Desafio de economia em cartela. Marque cada depósito e acompanhe o caminho até a meta.</p>
+      </div>
     </div>
-    <div class="sync off" id="sync"><i></i><span id="syncTxt">Salvo neste navegador</span></div>
+    <div class="sync"><i></i><span>Dados salvos neste dispositivo</span></div>
   </header>
 
-  <section class="tiles" aria-label="Resumo">
+  <section class="tiles" aria-label="Resumo" aria-live="polite">
     <div class="tile main"><span class="l">Guardado</span><span class="v" id="tSaved">R$ 0</span><span class="n" id="tPct">0% da meta</span></div>
     <div class="tile"><span class="l">Falta</span><span class="v" id="tLeft">R$ 0</span><span class="n" id="tGoal">de R$ 0</span></div>
     <div class="tile"><span class="l">Ritmo</span><span id="tPace"></span><span class="n" id="tPaceN"></span></div>
@@ -169,7 +188,13 @@ input:focus,select:focus{border-color:var(--accent);outline:none}
       <span style="display:flex;gap:8px"><button class="btn danger" id="warnYes" type="button">Sim, gerar nova</button><button class="btn ghost" id="warnNo" type="button">Cancelar</button></span>
     </div>
   </section>
-  <p class="hint" style="text-align:center">Cofre 2027 · por Prof. Eber Santana · <a href="https://www.instagram.com/prof.ebersantana/" style="color:inherit">@prof.ebersantana</a></p>
+  <footer class="foot">
+    <span>Cofrinho · por Prof. Eber Santana · <a href="https://www.instagram.com/prof.ebersantana/">@prof.ebersantana</a></span>
+    <span class="acts">
+      <button class="btn ghost sm" id="bkExp" type="button">Exportar backup</button>
+      <label class="btn ghost sm" for="bkImp" style="cursor:pointer;color:var(--ink);font-size:13px;flex-direction:row">Importar backup<input id="bkImp" type="file" accept="application/json,.json" hidden></label>
+    </span>
+  </footer>
 </main>
 
 <script>
@@ -180,7 +205,6 @@ input:focus,select:focus{border-color:var(--accent);outline:none}
   function $(id){ return document.getElementById(id); }
 
   var state = defaults();
-  var db = null, docRef = null, saveTimer = null, pending = null;
 
   function defaults(){
     return {goal:40000,start:"2027-01-01",end:"2027-12-31",mode:"cartela",seed:2027,done:[],extras:[]};
@@ -288,19 +312,7 @@ input:focus,select:focus{border-color:var(--accent);outline:none}
   function esc(s){ return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
 
   /* ---------- persistência ---------- */
-  function setSync(ok, txt){ $("sync").className = "sync" + (ok?"":" off"); $("syncTxt").textContent = txt; }
-  function persist(){
-    try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){}
-    if(docRef){
-      clearTimeout(saveTimer);
-      saveTimer = setTimeout(function(){
-        try{
-          var p = docRef.set(JSON.parse(JSON.stringify(state)));
-          if(p && p.then){ p.then(function(){ setSync(true,"Salvo na sua conta"); }).catch(function(){ setSync(false,"Salvo neste navegador"); }); }
-        }catch(e){ setSync(false,"Salvo neste navegador"); }
-      }, 500);
-    }
-  }
+  function persist(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){} }
   function normalize(d){
     var b = defaults();
     if(!d || typeof d !== "object") return b;
@@ -362,22 +374,22 @@ input:focus,select:focus{border-color:var(--accent);outline:none}
   try{ var raw = localStorage.getItem(LS_KEY); if(raw) state = normalize(JSON.parse(raw)); }catch(e){}
   fillCfg(); render();
 
-  (async function(){
-    try{
-      if(!window.claude || !claude.use) return;
-      var results = await Promise.all([claude.use("user"), claude.use("db")]);
-      var user = results[0]; db = results[1];
-      if(!user || !db) return;
-      var id = await user.id();
-      docRef = db.collection("data/users/"+id).doc("plano");
-      var snap = await docRef.get();
-      var data = snap && typeof snap.data === "function" ? snap.data() : snap;
-      var exists = snap && (typeof snap.exists === "function" ? snap.exists() : snap.exists !== false);
-      if(exists && data && typeof data === "object" && data.goal){ state = normalize(data); fillCfg(); render(); }
-      else { docRef.set(JSON.parse(JSON.stringify(state))); }
-      setSync(true,"Salvo na sua conta");
-    }catch(e){ docRef = null; }
-  })();
+  $("bkExp").addEventListener("click", function(){
+    var blob = new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+    var a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+    a.download = "cofrinho-backup-"+iso(today())+".json"; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+  });
+  $("bkImp").addEventListener("change", function(ev){
+    var f = ev.target.files[0]; if(!f) return;
+    var r = new FileReader();
+    r.onload = function(){
+      try{ var d = JSON.parse(r.result); if(!d || typeof d.goal !== "number") throw 0; state = normalize(d); persist(); fillCfg(); render(); }
+      catch(e){ $("warnTxt").textContent = "Arquivo inválido. Use um backup exportado por este app."; $("warnYes").hidden = true; $("warn").hidden = false; nextCfg = null; }
+    };
+    r.readAsText(f); ev.target.value = "";
+  });
+
 })();
 </script>
 </body>
