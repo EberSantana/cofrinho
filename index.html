@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cofre 2027</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: resumo e barra de progresso no topo, cartela de quadrados no centro, extras e ajustes abaixo */
+:root{
+  --bg:#eef2ee; --surface:#fbfdfb; --ink:#14231b; --muted:#5b6b61; --line:#d3ddd5;
+  --accent:#0f6b47; --accent-ink:#ffffff; --accent-soft:#dcefe4; --mark:#d6362b; --mark-soft:#fbe3e0;
+  --display:"Bricolage Grotesque", system-ui, sans-serif; --body:"Figtree", system-ui, sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1612; --surface:#15201a; --ink:#e6efe9; --muted:#93a59a; --line:#25352c;
+    --accent:#4cc58f; --accent-ink:#06150e; --accent-soft:#183326; --mark:#ff7a6b; --mark-soft:#3a1d1a;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1612; --surface:#15201a; --ink:#e6efe9; --muted:#93a59a; --line:#25352c;
+  --accent:#4cc58f; --accent-ink:#06150e; --accent-soft:#183326; --mark:#ff7a6b; --mark-soft:#3a1d1a;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:960px;margin:0 auto;padding:24px 16px 64px;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:clamp(30px,6vw,44px);line-height:1.05;font-weight:800}
+h1 .yr{color:var(--mark);text-decoration:underline;text-decoration-thickness:3px;text-underline-offset:6px;text-decoration-style:wavy}
+h2{font-size:20px;font-weight:700}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.sub{color:var(--muted);margin:6px 0 0;max-width:60ch}
+.sync{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.sync i{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block}
+.sync.off i{background:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.tile.main{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.tile .l{font-size:13px;color:var(--muted);font-weight:500}
+.tile.main .l{color:inherit;opacity:.85}
+.tile .v{font-family:var(--display);font-weight:800;font-size:clamp(22px,3.4vw,30px);font-variant-numeric:tabular-nums;line-height:1.15;overflow-wrap:anywhere}
+.tile .n{font-size:13px;color:var(--muted)}
+.tile.main .n{color:inherit;opacity:.85}
+.pill{display:inline-block;align-self:flex-start;font-size:13px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--accent-soft);color:var(--accent)}
+.pill.late{background:var(--mark-soft);color:var(--mark)}
+.pill.wait{background:var(--line);color:var(--muted)}
+.bar{position:relative;height:18px;background:var(--accent-soft);border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.bar>span{position:absolute;inset:0 auto 0 0;background:var(--accent);border-radius:99px;transition:width .4s ease}
+.bar .exp{position:absolute;top:-2px;bottom:-2px;width:3px;background:var(--mark);border-radius:2px}
+.ms{display:flex;justify-content:space-between;gap:4px;margin-top:10px;flex-wrap:wrap}
+.ms b{font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--muted);font-variant-numeric:tabular-nums}
+.ms b.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.legend{font-size:13px;color:var(--muted);margin-top:10px;display:flex;gap:14px;flex-wrap:wrap}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px;background:var(--accent)}
+.legend span.e::before{background:var(--mark);width:3px;border-radius:2px;height:12px;margin-right:7px}
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.sec-head p{margin:0;color:var(--muted);font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:8px}
+.sq{font:inherit;color:inherit;cursor:pointer;background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px 4px;min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;font-variant-numeric:tabular-nums;transition:transform .12s,background .15s,border-color .15s}
+.sq:hover{border-color:var(--accent);transform:translateY(-1px)}
+.sq .k{font-size:11px;color:var(--muted);line-height:1.2}
+.sq .a{font-family:var(--display);font-weight:700;font-size:17px;line-height:1.2}
+.sq[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.sq[aria-pressed="true"] .k{color:inherit;opacity:.8}
+.sq[aria-pressed="true"] .a{text-decoration:line-through;text-decoration-thickness:2px;opacity:.9}
+:focus-visible{outline:3px solid var(--mark);outline-offset:2px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+form.row{display:grid;grid-template-columns:1fr;gap:10px}
+label{font-size:13px;font-weight:600;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+input,select{font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0;width:100%}
+input:focus,select:focus{border-color:var(--accent);outline:none}
+.btn{font:inherit;font-weight:700;cursor:pointer;border:0;border-radius:10px;padding:11px 16px;background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.danger{background:var(--mark);color:#fff}
+.btn:hover{filter:brightness(1.06)}
+.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;max-height:280px;overflow:auto}
+.list li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px}
+.list li .v{font-weight:700;font-variant-numeric:tabular-nums;color:var(--accent)}
+.list li small{display:block;color:var(--muted)}
+.x{font:inherit;border:0;background:none;color:var(--muted);cursor:pointer;font-size:18px;padding:2px 8px;border-radius:8px}
+.x:hover{color:var(--mark)}
+.empty{color:var(--muted);font-size:14px;margin:0}
+.cfg{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;align-items:end}
+.warn{margin-top:12px;padding:12px;border-radius:10px;background:var(--mark-soft);display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:14px}
+.warn[hidden]{display:none}
+.hint{font-size:13px;color:var(--muted);margin:10px 0 0}
+@media (max-width:760px){
+  .tiles{grid-template-columns:1fr 1fr}
+  .two{grid-template-columns:1fr}
+  .cfg{grid-template-columns:1fr 1fr}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:6px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="top">
+    <div>
+      <h1>Cofre <span class="yr">2027</span></h1>
+      <p class="sub">Marque cada quadrado quando guardar o valor. A meta chega sozinha, um depósito de cada vez.</p>
+    </div>
+    <div class="sync off" id="sync"><i></i><span id="syncTxt">Salvo neste navegador</span></div>
+  </header>
+
+  <section class="tiles" aria-label="Resumo">
+    <div class="tile main"><span class="l">Guardado</span><span class="v" id="tSaved">R$ 0</span><span class="n" id="tPct">0% da meta</span></div>
+    <div class="tile"><span class="l">Falta</span><span class="v" id="tLeft">R$ 0</span><span class="n" id="tGoal">de R$ 0</span></div>
+    <div class="tile"><span class="l">Ritmo</span><span id="tPace"></span><span class="n" id="tPaceN"></span></div>
+    <div class="tile"><span class="l">Por semana daqui pra frente</span><span class="v" id="tWeek">R$ 0</span><span class="n" id="tWeekN"></span></div>
+  </section>
+
+  <section class="card" aria-label="Progresso">
+    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="bar"><span id="barFill" style="width:0%"></span><i class="exp" id="barExp" style="left:0%"></i></div>
+    <div class="ms" id="ms"></div>
+    <div class="legend"><span>O que você já guardou</span><span class="e">Onde você deveria estar hoje</span></div>
+  </section>
+
+  <section class="card">
+    <div class="sec-head">
+      <h2 id="gridTitle">Cartela</h2>
+      <p id="gridInfo"></p>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section class="two">
+    <div class="card">
+      <h2>Depósito extra</h2>
+      <p class="hint" style="margin:6px 0 12px">Guardou um valor fora da cartela (13º, bônus, venda)? Registre aqui e some na meta.</p>
+      <form class="row" id="exForm">
+        <label for="exVal">Valor em reais<input id="exVal" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="150" required></label>
+        <label for="exNote">Origem (opcional)<input id="exNote" type="text" maxlength="60" placeholder="Bônus de março"></label>
+        <button class="btn" type="submit">Registrar depósito</button>
+      </form>
+    </div>
+    <div class="card">
+      <h2>Histórico</h2>
+      <ul class="list" id="hist" style="margin-top:12px"></ul>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Ajustar o desafio</h2>
+    <p class="hint" style="margin:6px 0 14px">Mudar a meta ou o modelo gera uma cartela nova. Seus depósitos extras ficam.</p>
+    <form class="cfg" id="cfgForm">
+      <label for="cGoal">Meta (R$)<input id="cGoal" type="number" min="100" step="100" inputmode="numeric" required></label>
+      <label for="cStart">Início<input id="cStart" type="date" required></label>
+      <label for="cEnd">Fim<input id="cEnd" type="date" required></label>
+      <label for="cMode">Modelo
+        <select id="cMode">
+          <option value="cartela">Cartela de 100 quadrados</option>
+          <option value="progressivo">52 semanas, valor crescente</option>
+          <option value="fixo">52 semanas, valor fixo</option>
+        </select>
+      </label>
+      <button class="btn ghost" type="submit" style="grid-column:1/-1;justify-self:start">Gerar nova cartela</button>
+    </form>
+    <div class="warn" id="warn" hidden>
+      <span id="warnTxt"></span>
+      <span style="display:flex;gap:8px"><button class="btn danger" id="warnYes" type="button">Sim, gerar nova</button><button class="btn ghost" id="warnNo" type="button">Cancelar</button></span>
+    </div>
+  </section>
+  <p class="hint" style="text-align:center">Cofre 2027 · por Prof. Eber Santana · <a href="https://www.instagram.com/prof.ebersantana/" style="color:inherit">@prof.ebersantana</a></p>
+</main>
+
+<script>
+(function(){
+  var LS_KEY = "cofre2027.v1";
+  var brl = new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL",minimumFractionDigits:0,maximumFractionDigits:2});
+  function fmt(v){ return brl.format(v); }
+  function $(id){ return document.getElementById(id); }
+
+  var state = defaults();
+  var db = null, docRef = null, saveTimer = null, pending = null;
+
+  function defaults(){
+    return {goal:40000,start:"2027-01-01",end:"2027-12-31",mode:"cartela",seed:2027,done:[],extras:[]};
+  }
+
+  /* ---------- valores da cartela ---------- */
+  function rng(seed){ var a = seed>>>0; return function(){ a|=0; a=a+0x6D2B79F5|0; var t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+  function fixSum(vals, goal, step){
+    var sum = vals.reduce(function(a,b){return a+b;},0), diff = goal-sum;
+    var order = vals.map(function(_,i){return i;}).sort(function(a,b){return vals[b]-vals[a];});
+    var k = 0, guard = 100000;
+    while(Math.abs(diff) >= step && guard-- > 0){
+      var i = order[k % order.length], d = diff>0 ? step : -step;
+      if(vals[i]+d >= step){ vals[i]+=d; diff-=d; }
+      k++;
+    }
+    vals[order[0]] += diff;
+    return vals;
+  }
+  function buildValues(s){
+    var n, vals, i;
+    if(s.mode === "fixo"){
+      n = 52; var base = Math.floor(s.goal/n), rem = s.goal - base*n;
+      vals = []; for(i=0;i<n;i++) vals.push(base + (i<rem?1:0));
+      return vals;
+    }
+    n = s.mode === "cartela" ? 100 : 52;
+    var unit = s.goal * 2 / (n*(n+1));
+    vals = []; for(i=1;i<=n;i++) vals.push(Math.max(5, Math.round(i*unit/5)*5));
+    vals = fixSum(vals, s.goal, 5);
+    if(s.mode === "cartela"){
+      var r = rng(s.seed);
+      for(i=vals.length-1;i>0;i--){ var j = Math.floor(r()*(i+1)); var t = vals[i]; vals[i]=vals[j]; vals[j]=t; }
+    }
+    return vals;
+  }
+
+  /* ---------- datas ---------- */
+  function pd(str){ var p = str.split("-"); return new Date(+p[0], +p[1]-1, +p[2]); }
+  function today(){ var d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+  function iso(d){ var m = d.getMonth()+1, dd = d.getDate(); return d.getFullYear()+"-"+(m<10?"0":"")+m+"-"+(dd<10?"0":"")+dd; }
+  function brDate(str){ var p = str.split("-"); return p[2]+"/"+p[1]+"/"+p[0]; }
+  var DAY = 86400000;
+
+  /* ---------- render ---------- */
+  function totals(){
+    var vals = buildValues(state), grid = 0;
+    state.done.forEach(function(i){ if(vals[i]!=null) grid += vals[i]; });
+    var extra = state.extras.reduce(function(a,e){ return a+e.value; },0);
+    return {vals:vals, saved:grid+extra, grid:grid, extra:extra};
+  }
+  function render(){
+    var t = totals(), goal = state.goal, saved = t.saved;
+    var pct = Math.min(100, saved/goal*100), left = Math.max(0, goal-saved);
+    $("tSaved").textContent = fmt(saved);
+    $("tPct").textContent = (Math.round(pct*10)/10).toString().replace(".",",") + "% da meta";
+    $("tLeft").textContent = fmt(left);
+    $("tGoal").textContent = "de " + fmt(goal);
+
+    var s = pd(state.start), e = pd(state.end), td = today();
+    var total = Math.max(1, Math.round((e-s)/DAY)+1);
+    var elapsed = Math.min(total, Math.max(0, Math.round((td-s)/DAY)+1));
+    var expected = goal*elapsed/total, diff = saved-expected;
+    var pace = $("tPace"), paceN = $("tPaceN");
+    var cls = "pill", txt, note;
+    if(saved >= goal){ txt = "Meta batida"; note = "Parabéns, você chegou lá."; }
+    else if(td < s){ cls += " wait"; var dd = Math.round((s-td)/DAY); txt = "Começa em " + dd + (dd===1?" dia":" dias"); note = "Início em " + brDate(state.start); }
+    else if(td > e){ cls += " late"; txt = "Prazo encerrado"; note = "Faltam " + fmt(left); }
+    else if(diff >= 0){ txt = "No ritmo"; note = fmt(diff) + " à frente do previsto"; }
+    else { cls += " late"; txt = "Atrasado"; note = fmt(-diff) + " abaixo do previsto"; }
+    pace.className = cls; pace.textContent = txt; paceN.textContent = note;
+
+    var from = td > s ? td : s, weeks = Math.max(1, Math.ceil((e-from)/DAY/7));
+    if(left <= 0){ $("tWeek").textContent = fmt(0); $("tWeekN").textContent = "Nada a guardar"; }
+    else if(td > e){ $("tWeek").textContent = "—"; $("tWeekN").textContent = "Prazo passou, ajuste as datas"; }
+    else { $("tWeek").textContent = fmt(left/weeks); $("tWeekN").textContent = "em " + weeks + (weeks===1?" semana":" semanas") + " até " + brDate(state.end); }
+
+    $("barFill").style.width = pct + "%";
+    $("barExp").style.left = Math.min(99.5, expected/goal*100) + "%";
+    $("bar").setAttribute("aria-valuenow", Math.round(pct));
+    $("bar").setAttribute("aria-label", "Progresso da meta: " + Math.round(pct) + "%");
+    var ms = ""; [10,25,50,75,100].forEach(function(m){ ms += '<b class="'+(pct>=m?"on":"")+'">'+m+'% · '+fmt(goal*m/100)+'</b>'; });
+    $("ms").innerHTML = ms;
+
+    var names = {cartela:"Cartela de 100 quadrados", progressivo:"52 semanas, valor crescente", fixo:"52 semanas, valor fixo"};
+    $("gridTitle").textContent = names[state.mode];
+    var doneCount = state.done.filter(function(i){return t.vals[i]!=null;}).length;
+    $("gridInfo").textContent = doneCount + " de " + t.vals.length + " marcados · " + fmt(t.grid) + " na cartela";
+    var html = "";
+    t.vals.forEach(function(v,i){
+      var on = state.done.indexOf(i) > -1;
+      var k = state.mode === "cartela" ? "nº " + (i+1) : "Sem " + (i+1);
+      html += '<button type="button" class="sq" data-i="'+i+'" aria-pressed="'+on+'" aria-label="'+k+', '+fmt(v)+(on?', guardado':'')+'"><span class="k">'+k+'</span><span class="a">'+fmt(v).replace("R$ ","")+'</span></button>';
+    });
+    $("grid").innerHTML = html;
+
+    var rows = [];
+    state.done.forEach(function(i){ if(t.vals[i]!=null) rows.push(null); });
+    var h = "";
+    state.extras.slice().reverse().forEach(function(x){
+      h += '<li><span>'+esc(x.note || "Depósito extra")+'<small>'+brDate(x.date)+'</small></span><span style="display:flex;align-items:center;gap:4px"><span class="v">+ '+fmt(x.value)+'</span><button class="x" type="button" data-x="'+x.id+'" aria-label="Remover depósito de '+fmt(x.value)+'">×</button></span></li>';
+    });
+    $("hist").innerHTML = h || '<li style="border:0;padding:0"><p class="empty">Nenhum depósito extra ainda. Os quadrados marcados na cartela contam automaticamente.</p></li>';
+  }
+  function esc(s){ return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+
+  /* ---------- persistência ---------- */
+  function setSync(ok, txt){ $("sync").className = "sync" + (ok?"":" off"); $("syncTxt").textContent = txt; }
+  function persist(){
+    try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){}
+    if(docRef){
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(function(){
+        try{
+          var p = docRef.set(JSON.parse(JSON.stringify(state)));
+          if(p && p.then){ p.then(function(){ setSync(true,"Salvo na sua conta"); }).catch(function(){ setSync(false,"Salvo neste navegador"); }); }
+        }catch(e){ setSync(false,"Salvo neste navegador"); }
+      }, 500);
+    }
+  }
+  function normalize(d){
+    var b = defaults();
+    if(!d || typeof d !== "object") return b;
+    ["goal","seed"].forEach(function(k){ if(typeof d[k]==="number" && isFinite(d[k])) b[k]=d[k]; });
+    ["start","end"].forEach(function(k){ if(/^\d{4}-\d{2}-\d{2}$/.test(d[k]||"")) b[k]=d[k]; });
+    if(["cartela","progressivo","fixo"].indexOf(d.mode)>-1) b.mode = d.mode;
+    if(Array.isArray(d.done)) b.done = d.done.filter(function(i){return Number.isInteger(i)&&i>=0;});
+    if(Array.isArray(d.extras)) b.extras = d.extras.filter(function(x){return x && typeof x.value==="number" && x.value>0;}).map(function(x){return {id:x.id||Date.now(),date:/^\d{4}-\d{2}-\d{2}$/.test(x.date||"")?x.date:iso(today()),value:x.value,note:String(x.note||"").slice(0,60)};});
+    return b;
+  }
+
+  /* ---------- eventos ---------- */
+  $("grid").addEventListener("click", function(ev){
+    var b = ev.target.closest(".sq"); if(!b) return;
+    var i = +b.getAttribute("data-i"), at = state.done.indexOf(i);
+    if(at > -1) state.done.splice(at,1); else state.done.push(i);
+    persist(); render();
+    var nb = $("grid").querySelector('[data-i="'+i+'"]'); if(nb) nb.focus();
+  });
+  $("exForm").addEventListener("submit", function(ev){
+    ev.preventDefault();
+    var v = parseFloat($("exVal").value);
+    if(!(v>0)) return;
+    state.extras.push({id:Date.now(),date:iso(today()),value:Math.round(v*100)/100,note:$("exNote").value.trim()});
+    $("exVal").value = ""; $("exNote").value = "";
+    persist(); render();
+  });
+  $("hist").addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-x]"); if(!b) return;
+    var id = b.getAttribute("data-x");
+    state.extras = state.extras.filter(function(x){ return String(x.id) !== id; });
+    persist(); render();
+  });
+  function fillCfg(){ $("cGoal").value = state.goal; $("cStart").value = state.start; $("cEnd").value = state.end; $("cMode").value = state.mode; }
+  var nextCfg = null;
+  function applyCfg(c){
+    var changed = c.goal !== state.goal || c.mode !== state.mode;
+    state.goal = c.goal; state.start = c.start; state.end = c.end; state.mode = c.mode;
+    if(changed){ state.done = []; state.seed = Math.floor(Math.random()*1e6); }
+    persist(); render(); fillCfg();
+  }
+  $("cfgForm").addEventListener("submit", function(ev){
+    ev.preventDefault();
+    var c = {goal:Math.round(parseFloat($("cGoal").value)), start:$("cStart").value, end:$("cEnd").value, mode:$("cMode").value};
+    if(!(c.goal>=100) || !c.start || !c.end) return;
+    if(pd(c.end) < pd(c.start)){ $("warnTxt").textContent = "A data final precisa ser depois da inicial."; $("warnYes").hidden = true; $("warn").hidden = false; nextCfg = null; return; }
+    $("warnYes").hidden = false;
+    var willReset = (c.goal !== state.goal || c.mode !== state.mode) && state.done.length > 0;
+    if(willReset){
+      nextCfg = c;
+      $("warnTxt").textContent = "Gerar uma cartela nova apaga as " + state.done.length + " marcações atuais. Continuar?";
+      $("warn").hidden = false;
+    } else { $("warn").hidden = true; applyCfg(c); }
+  });
+  $("warnYes").addEventListener("click", function(){ if(nextCfg) applyCfg(nextCfg); nextCfg = null; $("warn").hidden = true; });
+  $("warnNo").addEventListener("click", function(){ nextCfg = null; $("warn").hidden = true; fillCfg(); });
+
+  /* ---------- início ---------- */
+  try{ var raw = localStorage.getItem(LS_KEY); if(raw) state = normalize(JSON.parse(raw)); }catch(e){}
+  fillCfg(); render();
+
+  (async function(){
+    try{
+      if(!window.claude || !claude.use) return;
+      var results = await Promise.all([claude.use("user"), claude.use("db")]);
+      var user = results[0]; db = results[1];
+      if(!user || !db) return;
+      var id = await user.id();
+      docRef = db.collection("data/users/"+id).doc("plano");
+      var snap = await docRef.get();
+      var data = snap && typeof snap.data === "function" ? snap.data() : snap;
+      var exists = snap && (typeof snap.exists === "function" ? snap.exists() : snap.exists !== false);
+      if(exists && data && typeof data === "object" && data.goal){ state = normalize(data); fillCfg(); render(); }
+      else { docRef.set(JSON.parse(JSON.stringify(state))); }
+      setSync(true,"Salvo na sua conta");
+    }catch(e){ docRef = null; }
+  })();
+})();
+</script>
+</body>
+</html>
