@@ -89,8 +89,11 @@ h2{font-size:20px;font-weight:700}
 :focus-visible{outline:3px solid var(--mark);outline-offset:2px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 form.row{display:grid;grid-template-columns:1fr;gap:10px}
-label{font-size:13px;font-weight:600;color:var(--muted);display:flex;flex-direction:column;gap:4px}
-input,select{font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0;width:100%}
+label{font-size:13px;font-weight:600;color:var(--muted);display:flex;flex-direction:column;gap:6px;min-width:0}
+input,select{font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:0 12px;height:46px;line-height:1.2;min-width:0;max-width:100%;width:100%;display:block;text-align:left;-webkit-appearance:none;appearance:none}
+input[type="date"]::-webkit-date-and-time-value{text-align:left;margin:0}
+input[type="date"]::-webkit-datetime-edit{padding:0}
+select{padding-right:38px;text-overflow:ellipsis;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2393a59a' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
 input:focus,select:focus{border-color:var(--accent);outline:none}
 .btn{font:inherit;font-weight:700;cursor:pointer;border:0;border-radius:10px;padding:11px 16px;background:var(--accent);color:var(--accent-ink)}
 .btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
@@ -103,16 +106,18 @@ input:focus,select:focus{border-color:var(--accent);outline:none}
 .x{font:inherit;border:0;background:none;color:var(--muted);cursor:pointer;font-size:18px;padding:2px 8px;border-radius:8px}
 .x:hover{color:var(--mark)}
 .empty{color:var(--muted);font-size:14px;margin:0}
-.cfg{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;align-items:end}
+.cfg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:start}
 .warn{margin-top:12px;padding:12px;border-radius:10px;background:var(--mark-soft);display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:14px}
 .warn[hidden]{display:none}
 .hint{font-size:13px;color:var(--muted);margin:10px 0 0}
 @media (max-width:760px){
   .tiles{grid-template-columns:1fr 1fr}
   .two{grid-template-columns:1fr}
-  .cfg{grid-template-columns:1fr 1fr}
+  .cfg{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  #cMode{font-size:15px}
   .grid{grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:6px}
 }
+@media (max-width:480px){.cfg{grid-template-columns:minmax(0,1fr)}.cfg .btn{width:100%;justify-self:stretch!important}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -177,8 +182,8 @@ input:focus,select:focus{border-color:var(--accent);outline:none}
       <label for="cMode">Modelo
         <select id="cMode">
           <option value="cartela">Cartela de 100 quadrados</option>
-          <option value="progressivo">52 semanas, valor crescente</option>
-          <option value="fixo">52 semanas, valor fixo</option>
+          <option value="progressivo">52 semanas crescente</option>
+          <option value="fixo">52 semanas fixo</option>
         </select>
       </label>
       <button class="btn ghost" type="submit" style="grid-column:1/-1;justify-self:start">Gerar nova cartela</button>
