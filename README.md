@@ -11,8 +11,9 @@ Sistema web de economia no formato de **desafio de cartela**: o usuário define 
   - 52 semanas com valor crescente
   - 52 semanas com valor fixo
 - **Soma exata da meta**: os valores são ajustados para que a cartela feche exatamente o total definido.
-- **Painel de resumo**: total guardado, quanto falta, ritmo (adiantado, no ritmo ou atrasado em relação ao previsto para a data) e valor necessário por semana para chegar à meta.
-- **Marcos de progresso**: 10%, 25%, 50%, 75% e 100%.
+- **Painel de resumo**: anel de progresso, total guardado, quanto falta, ritmo (adiantado, no ritmo ou atrasado em relação ao previsto para a data) e valor necessário por semana para chegar à meta.
+- **Marcos de progresso**: 10%, 25%, 50%, 75% e 100%, com a marca de onde você deveria estar hoje.
+- **Filtros da cartela**: todos, pendentes ou guardados.
 - **Depósitos extras**: registro de valores fora da cartela (13º, bônus, vendas), com histórico.
 - **Configuração livre**: meta, data de início, data final e modelo.
 - **Backup**: exportação e importação dos dados em arquivo JSON.
