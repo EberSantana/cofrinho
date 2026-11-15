@@ -102,7 +102,7 @@ h2{font-size:18px;font-weight:600}
 .track{position:relative;height:12px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line);overflow:visible}
 .track>span{position:absolute;inset:0 auto 0 0;border-radius:99px;background:linear-gradient(90deg,var(--brand),var(--accent));transition:width .6s cubic-bezier(.2,.7,.2,1)}
 .track .exp{position:absolute;top:-6px;bottom:-6px;width:2px;background:var(--ink);border-radius:2px}
-.track .exp::after{content:"hoje";position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:700;color:var(--muted)}
+.track .exp::after{content:"hoje";position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:12px;font-weight:700;color:var(--muted)}
 .ms{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:16px}
 .ms b{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);font-weight:600;font-size:12px;color:var(--muted)}
 .ms b em{font-style:normal;font-family:var(--display);font-size:15px;color:var(--ink)}
@@ -116,7 +116,7 @@ h2{font-size:18px;font-weight:600}
 .grid{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:8px}
 .sq{position:relative;font:inherit;color:inherit;cursor:pointer;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:10px 4px 8px;min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-variant-numeric:tabular-nums;transition:transform .12s,background .15s,border-color .15s,box-shadow .15s}
 .sq:hover{border-color:var(--brand);transform:translateY(-1px);box-shadow:var(--shadow)}
-.sq .k{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.02em}
+.sq .k{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.02em}
 .sq .a{font-family:var(--display);font-weight:600;font-size:16px;line-height:1.2}
 .sq[aria-pressed="true"]{background:var(--hero);border-color:var(--hero);color:var(--hero-ink)}
 .sq[aria-pressed="true"] .k{color:var(--accent)}
@@ -181,7 +181,7 @@ select{padding-right:38px;text-overflow:ellipsis;background-image:url("data:imag
   .nav-in{padding:10px 14px}
   .chip-safe{display:none}
   .nav-acts .bt{display:none}
-  .nav-acts .btn{width:36px;padding:0}
+  .nav-acts .btn{width:44px;height:44px;padding:0}
   .card{padding:18px}
   .hcard{grid-template-columns:1fr;padding:22px}
   .ring{width:120px;height:120px;position:absolute;top:18px;right:18px}
@@ -194,13 +194,46 @@ select{padding-right:38px;text-overflow:ellipsis;background-image:url("data:imag
   .ms{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
   .ms b{padding:8px 6px;align-items:center;text-align:center}
   .ms b em{font-size:12px}
-  .grid{grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:6px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:8px}
   .sq{min-height:56px}
   .sq .a{font-size:14px}
   .cfg,form.row{grid-template-columns:minmax(0,1fr)}
   .cfg .btn{width:100%}
   .seg{width:100%}.seg button{flex:1}
 }
+/* feedback, erros, onboarding, gráfico */
+.err{color:var(--warn);font-size:13px;font-weight:600;margin:0}
+input.invalid{border-color:var(--warn)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--hero);color:var(--hero-ink);padding:6px 8px 6px 18px;border-radius:14px;display:flex;gap:10px;align-items:center;box-shadow:0 12px 32px -8px rgba(0,0,0,.45);max-width:calc(100% - 28px);transition:opacity .25s,transform .25s;z-index:30;font-weight:600;font-size:14px}
+.toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.toast button{font:inherit;font-weight:800;color:var(--accent);background:none;border:0;cursor:pointer;padding:0 12px;min-height:44px;border-radius:10px}
+.toast button:empty{display:none}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;list-style:none;padding:0;margin:0;counter-reset:s}
+.steps li{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--muted)}
+.steps li::before{counter-increment:s;content:counter(s);width:28px;height:28px;border-radius:50%;background:var(--hero);color:var(--hero-ink);display:grid;place-items:center;font-weight:800;font-size:13px;font-family:var(--display);margin-bottom:4px}
+.steps b{color:var(--ink);font-size:15px}
+.chart{width:100%}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart text{fill:var(--muted);font:600 12px var(--body)}
+.chart .c-grid{stroke:var(--line);stroke-width:1}
+.chart .c-exp{stroke:var(--muted);stroke-width:2;stroke-dasharray:7 6;fill:none}
+.chart .c-val{stroke:var(--brand);stroke-width:3;fill:none;stroke-linejoin:round;stroke-linecap:round}
+.chart .c-area{fill:var(--brand);opacity:.14}
+.chart .c-dot{fill:var(--brand);stroke:var(--surface);stroke-width:3}
+.chart .c-today{stroke:var(--ink);stroke-width:1.5;stroke-dasharray:2 4}
+.legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font-size:13px;color:var(--muted);font-weight:600}
+.legend i{display:inline-block;width:22px;height:0;border-top:3px solid var(--brand);vertical-align:middle;margin-right:8px}
+.legend i.d{border-top:2px dashed var(--muted)}
+.tbl{overflow:auto;max-height:260px;margin-top:10px;border:1px solid var(--line);border-radius:12px}
+.tbl table{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th,.tbl td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line)}
+.tbl th{position:sticky;top:0;background:var(--surface-2);font-weight:700}
+.tbl td.r,.tbl th.r{text-align:right;font-variant-numeric:tabular-nums}
+details.more{margin-top:14px;font-size:14px}
+details.more summary{cursor:pointer;font-weight:700;color:var(--brand);min-height:44px;display:flex;align-items:center}
+@media (pointer:coarse){.btn.sm{min-height:44px;min-width:44px}.x{min-width:44px;min-height:44px}.seg button{min-height:44px}}
+@media (max-width:600px){.steps{grid-template-columns:1fr}}
+@media print{.toast{display:none}}
 @media print{.nav,.foot,#cfgCard,#exForm,.seg{display:none}body{background:#fff}.card,.hcard,.kpi{box-shadow:none}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -255,10 +288,26 @@ select{padding-right:38px;text-overflow:ellipsis;background-image:url("data:imag
     </div>
   </section>
 
+  <section class="card intro" id="intro" aria-label="Como funciona" hidden>
+    <div class="head"><div><h2>Como funciona</h2><p>Três passos para começar. Você pode fechar este aviso a qualquer momento.</p></div><button class="btn ghost sm" id="introSkip" type="button">Entendi, fechar</button></div>
+    <ol class="steps">
+      <li><b>Defina a meta</b>Ajuste valor e prazo em “Ajustar o desafio”, no fim da página.</li>
+      <li><b>Guarde e marque</b>Cada quadrado é um valor. Guardou? Toque nele para marcar.</li>
+      <li><b>Acompanhe o ritmo</b>O painel mostra se você está adiantado ou atrasado em relação ao prazo.</li>
+    </ol>
+  </section>
+
   <section class="card" aria-label="Linha do tempo">
     <div class="head"><div><h2>Caminho até a meta</h2><p>A marca “hoje” mostra onde você deveria estar pelo calendário.</p></div></div>
     <div class="track" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="bar"><span id="barFill" style="width:0%"></span><i class="exp" id="barExp" style="left:0%"></i></div>
     <div class="ms" id="ms"></div>
+  </section>
+
+  <section class="card" aria-label="Evolução">
+    <div class="head"><div><h2>Evolução do saldo</h2><p id="chartSum"></p></div></div>
+    <div class="chart" id="chart"></div>
+    <div class="legend"><span><i></i>Guardado</span><span><i class="d"></i>Previsto pelo calendário</span></div>
+    <details class="more"><summary>Ver os dados em tabela</summary><div class="tbl" id="tbl"></div></details>
   </section>
 
   <section class="card">
@@ -277,8 +326,8 @@ select{padding-right:38px;text-overflow:ellipsis;background-image:url("data:imag
   <section class="two">
     <div class="card">
       <div class="head"><div><h2>Depósito extra</h2><p>13º, bônus, venda: registre e some na meta.</p></div></div>
-      <form class="row" id="exForm">
-        <label for="exVal">Valor<span class="field"><span class="pre">R$</span><input id="exVal" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="150,00" required></span></label>
+      <form class="row" id="exForm" novalidate>
+        <label for="exVal">Valor<span class="field"><span class="pre">R$</span><input id="exVal" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="150,00" aria-describedby="exValErr"></span><p class="err" id="exValErr" role="alert" hidden></p></label>
         <label for="exNote">Origem<input id="exNote" type="text" maxlength="60" placeholder="Ex.: bônus de março"></label>
         <button class="btn" type="submit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Registrar depósito</button>
       </form>
@@ -291,10 +340,10 @@ select{padding-right:38px;text-overflow:ellipsis;background-image:url("data:imag
 
   <section class="card" id="cfgCard">
     <div class="head"><div><h2>Ajustar o desafio</h2><p>Mudar a meta ou o modelo gera uma cartela nova. Os depósitos extras são mantidos.</p></div></div>
-    <form class="cfg" id="cfgForm">
-      <label for="cGoal">Meta<span class="field"><span class="pre">R$</span><input id="cGoal" type="number" min="100" step="100" inputmode="numeric" required></span></label>
+    <form class="cfg" id="cfgForm" novalidate>
+      <label for="cGoal">Meta<span class="field"><span class="pre">R$</span><input id="cGoal" type="number" min="100" step="100" inputmode="numeric" aria-describedby="cGoalErr"></span><p class="err" id="cGoalErr" role="alert" hidden></p></label>
       <label for="cStart">Início<input id="cStart" type="date" required></label>
-      <label for="cEnd">Fim<input id="cEnd" type="date" required></label>
+      <label for="cEnd">Fim<input id="cEnd" type="date" aria-describedby="cEndErr"><p class="err" id="cEndErr" role="alert" hidden></p></label>
       <label for="cMode">Modelo
         <select id="cMode">
           <option value="cartela">Cartela de 100 quadrados</option>
@@ -315,6 +364,7 @@ select{padding-right:38px;text-overflow:ellipsis;background-image:url("data:imag
     <a href="https://www.instagram.com/prof.ebersantana/">@prof.ebersantana</a>
   </footer>
 </main>
+<div class="toast" id="toast" role="status" aria-live="polite"><span id="toastMsg"></span><button type="button" id="toastBtn"></button></div>
 
 <script>
 (function(){
@@ -326,7 +376,7 @@ select{padding-right:38px;text-overflow:ellipsis;background-image:url("data:imag
   var state = defaults();
 
   function defaults(){
-    return {goal:40000,start:"2027-01-01",end:"2027-12-31",mode:"cartela",seed:2027,done:[],extras:[]};
+    return {goal:40000,start:"2027-01-01",end:"2027-12-31",mode:"cartela",seed:2027,done:[],dates:{},extras:[],introDismissed:false};
   }
 
   /* ---------- valores da cartela ---------- */
@@ -439,7 +489,46 @@ select{padding-right:38px;text-overflow:ellipsis;background-image:url("data:imag
     });
     $("histInfo").textContent = state.extras.length ? state.extras.length + (state.extras.length===1?" depósito":" depósitos") + " · " + fmt(t.extra) : "Os quadrados da cartela contam automaticamente.";
     $("hist").innerHTML = h || '<li class="empty" style="border:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h3"/></svg>Nenhum depósito extra ainda.</li>';
+    renderIntro(); drawChart(t);
   }
+
+  /* ---------- gráfico de evolução ---------- */
+  function drawChart(t){
+    var box = $("chart"), goal = state.goal;
+    var W = Math.max(280, box.clientWidth || 640), H = 230, pl = 74, pr = 18, pt = 20, pb = 34;
+    var s0 = pd(state.start).getTime(), e0 = pd(state.end).getTime(), span = Math.max(DAY, e0 - s0), tdMs = today().getTime();
+    function X(ms){ return pl + (Math.min(Math.max(ms,s0),e0)-s0)/span*(W-pl-pr); }
+    function Y(v){ return pt + (1-Math.min(1,v/goal))*(H-pt-pb); }
+    var fb = iso(today()), ev = [];
+    state.done.forEach(function(i){ if(t.vals[i]!=null) ev.push({d:state.dates[i]||fb, v:t.vals[i], o:(state.mode==="cartela"?"Quadrado ":"Semana ")+(i+1)}); });
+    state.extras.forEach(function(x){ ev.push({d:x.date, v:x.value, o:x.note||"Depósito extra"}); });
+    ev.sort(function(a,b){ return a.d<b.d?-1:a.d>b.d?1:0; });
+    var cum = 0, rows = ev.map(function(x){ cum += x.v; return {d:x.d,o:x.o,v:x.v,c:cum}; });
+    var line = "M"+X(s0)+","+Y(0), prev = 0;
+    rows.forEach(function(r){ var x = X(pd(r.d).getTime()); line += " L"+x+","+Y(prev)+" L"+x+","+Y(r.c); prev = r.c; });
+    var endX = X(Math.max(rows.length? pd(rows[rows.length-1].d).getTime() : s0, Math.min(tdMs, e0)));
+    line += " L"+endX+","+Y(prev);
+    var area = line + " L"+endX+","+Y(0)+" Z";
+    var g = "";
+    [0,.5,1].forEach(function(f){ var y = Y(goal*f); g += '<line class="c-grid" x1="'+pl+'" x2="'+(W-pr)+'" y1="'+y+'" y2="'+y+'"/><text x="'+(pl-10)+'" y="'+(y+4)+'" text-anchor="end">'+fmt(goal*f)+'</text>'; });
+    var xs = [[s0,"start"],[s0+span/2,"middle"],[e0,"end"]];
+    xs.forEach(function(p){ var dt = new Date(p[0]); g += '<text x="'+X(p[0])+'" y="'+(H-8)+'" text-anchor="'+p[1]+'">'+iso(dt).split("-").reverse().join("/")+'</text>'; });
+    var todayLine = "";
+    if(tdMs >= s0 && tdMs <= e0) todayLine = '<line class="c-today" x1="'+X(tdMs)+'" x2="'+X(tdMs)+'" y1="'+pt+'" y2="'+(H-pb)+'"/>';
+    var dot = rows.length ? '<circle class="c-dot" cx="'+endX+'" cy="'+Y(prev)+'" r="6"/>' : '';
+    var exp = '<line class="c-exp" x1="'+X(s0)+'" y1="'+Y(0)+'" x2="'+X(e0)+'" y2="'+Y(goal)+'"/>';
+    var expToday = Math.min(goal, Math.max(0, goal*(tdMs-s0)/span));
+    var sum = "Guardado " + fmt(t.saved) + " de " + fmt(goal) + ". " + (tdMs<s0 ? "O período ainda não começou." : "Previsto até hoje: " + fmt(expToday) + ".");
+    $("chartSum").textContent = sum;
+    box.innerHTML = '<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Gráfico de linhas. '+sum+'">'+g+exp+'<path class="c-area" d="'+area+'"/><path class="c-val" d="'+line+'"/>'+todayLine+dot+'</svg>';
+    var tb = '<table><thead><tr><th>Data</th><th>Origem</th><th class="r">Valor</th><th class="r">Acumulado</th></tr></thead><tbody>';
+    rows.slice().reverse().forEach(function(r){ tb += '<tr><td>'+brDate(r.d)+'</td><td>'+esc(r.o)+'</td><td class="r">'+fmt(r.v)+'</td><td class="r">'+fmt(r.c)+'</td></tr>'; });
+    $("tbl").innerHTML = rows.length ? tb + '</tbody></table>' : '<p class="empty" style="padding:18px">Ainda não há depósitos. A tabela aparece quando você marcar o primeiro quadrado.</p>';
+  }
+  function renderIntro(){ $("intro").hidden = state.introDismissed || state.done.length > 0 || state.extras.length > 0; }
+  $("introSkip").addEventListener("click", function(){ state.introDismissed = true; persist(); renderIntro(); });
+  var rz = null;
+  window.addEventListener("resize", function(){ clearTimeout(rz); rz = setTimeout(function(){ drawChart(totals()); }, 120); });
   document.querySelector(".seg").addEventListener("click", function(ev){
     var b = ev.target.closest("[data-f]"); if(!b) return;
     filter = b.getAttribute("data-f");
@@ -457,45 +546,92 @@ select{padding-right:38px;text-overflow:ellipsis;background-image:url("data:imag
     ["start","end"].forEach(function(k){ if(/^\d{4}-\d{2}-\d{2}$/.test(d[k]||"")) b[k]=d[k]; });
     if(["cartela","progressivo","fixo"].indexOf(d.mode)>-1) b.mode = d.mode;
     if(Array.isArray(d.done)) b.done = d.done.filter(function(i){return Number.isInteger(i)&&i>=0;});
+    if(d.dates && typeof d.dates === "object") Object.keys(d.dates).forEach(function(k){ if(/^\d{4}-\d{2}-\d{2}$/.test(d.dates[k]||"")) b.dates[k] = d.dates[k]; });
+    b.introDismissed = d.introDismissed === true;
     if(Array.isArray(d.extras)) b.extras = d.extras.filter(function(x){return x && typeof x.value==="number" && x.value>0;}).map(function(x){return {id:x.id||Date.now(),date:/^\d{4}-\d{2}-\d{2}$/.test(x.date||"")?x.date:iso(today()),value:x.value,note:String(x.note||"").slice(0,60)};});
     return b;
   }
 
   /* ---------- eventos ---------- */
+  /* ---------- aviso (toast) com desfazer ---------- */
+  var toastTimer = null, toastUndo = null;
+  function toast(msg, undoFn){
+    $("toastMsg").textContent = msg; toastUndo = undoFn || null;
+    $("toastBtn").textContent = undoFn ? "Desfazer" : "";
+    $("toast").classList.add("on");
+    clearTimeout(toastTimer); toastTimer = setTimeout(function(){ $("toast").classList.remove("on"); toastUndo = null; }, undoFn ? 6000 : 3500);
+  }
+  $("toastBtn").addEventListener("click", function(){ var f = toastUndo; toastUndo = null; $("toast").classList.remove("on"); if(f) f(); });
+
+  var MARCOS = [10,25,50,75,100];
+  function toggleSquare(i, silent){
+    var goal = state.goal, before = totals().saved, at = state.done.indexOf(i), marked = at < 0;
+    if(marked){ state.done.push(i); state.dates[i] = iso(today()); } else { state.done.splice(at,1); delete state.dates[i]; }
+    persist(); render();
+    var nb = $("grid").querySelector('[data-i="'+i+'"]'); if(nb && !silent) nb.focus();
+    if(silent) return;
+    var t = totals(), v = t.vals[i];
+    if(marked){
+      try{ if(navigator.vibrate) navigator.vibrate(10); }catch(e){}
+      var pb = before/goal*100, pa = t.saved/goal*100, hit = 0;
+      MARCOS.forEach(function(m){ if(pb < m && pa >= m) hit = m; });
+      toast(hit ? "Marco de " + hit + "% atingido! Total: " + fmt(t.saved) : fmt(v) + " guardado. Total: " + fmt(t.saved), function(){ toggleSquare(i, true); });
+    } else {
+      toast("Quadrado de " + fmt(v) + " desmarcado.", function(){ toggleSquare(i, true); });
+    }
+  }
   $("grid").addEventListener("click", function(ev){
     var b = ev.target.closest(".sq"); if(!b) return;
-    var i = +b.getAttribute("data-i"), at = state.done.indexOf(i);
-    if(at > -1) state.done.splice(at,1); else state.done.push(i);
-    persist(); render();
-    var nb = $("grid").querySelector('[data-i="'+i+'"]'); if(nb) nb.focus();
+    toggleSquare(+b.getAttribute("data-i"), false);
   });
+
+  /* ---------- erros junto ao campo ---------- */
+  function setErr(inputId, errId, msg){
+    var el = $(errId), inp = $(inputId);
+    el.hidden = !msg; el.textContent = msg || "";
+    inp.classList.toggle("invalid", !!msg);
+    if(msg) inp.setAttribute("aria-invalid","true"); else inp.removeAttribute("aria-invalid");
+  }
+  $("exVal").addEventListener("input", function(){ setErr("exVal","exValErr",""); });
+  $("cGoal").addEventListener("input", function(){ setErr("cGoal","cGoalErr",""); });
+  $("cEnd").addEventListener("input", function(){ setErr("cEnd","cEndErr",""); });
+  $("cStart").addEventListener("input", function(){ setErr("cEnd","cEndErr",""); });
+
   $("exForm").addEventListener("submit", function(ev){
     ev.preventDefault();
     var v = parseFloat($("exVal").value);
-    if(!(v>0)) return;
+    if(!(v>0)){ setErr("exVal","exValErr","Informe um valor maior que zero."); $("exVal").focus(); return; }
+    setErr("exVal","exValErr","");
     state.extras.push({id:Date.now(),date:iso(today()),value:Math.round(v*100)/100,note:$("exNote").value.trim()});
     $("exVal").value = ""; $("exNote").value = "";
     persist(); render();
+    toast(fmt(Math.round(v*100)/100) + " registrado. Total: " + fmt(totals().saved));
   });
   $("hist").addEventListener("click", function(ev){
     var b = ev.target.closest("[data-x]"); if(!b) return;
-    var id = b.getAttribute("data-x");
+    var id = b.getAttribute("data-x"), removed = state.extras.filter(function(x){ return String(x.id) === id; })[0];
     state.extras = state.extras.filter(function(x){ return String(x.id) !== id; });
     persist(); render();
+    if(removed) toast("Depósito de " + fmt(removed.value) + " removido.", function(){ state.extras.push(removed); persist(); render(); });
   });
   function fillCfg(){ $("cGoal").value = state.goal; $("cStart").value = state.start; $("cEnd").value = state.end; $("cMode").value = state.mode; }
   var nextCfg = null;
   function applyCfg(c){
     var changed = c.goal !== state.goal || c.mode !== state.mode;
     state.goal = c.goal; state.start = c.start; state.end = c.end; state.mode = c.mode;
-    if(changed){ state.done = []; state.seed = Math.floor(Math.random()*1e6); }
+    if(changed){ state.done = []; state.dates = {}; state.seed = Math.floor(Math.random()*1e6); }
     persist(); render(); fillCfg();
+    toast("Desafio atualizado.");
   }
   $("cfgForm").addEventListener("submit", function(ev){
     ev.preventDefault();
     var c = {goal:Math.round(parseFloat($("cGoal").value)), start:$("cStart").value, end:$("cEnd").value, mode:$("cMode").value};
-    if(!(c.goal>=100) || !c.start || !c.end) return;
-    if(pd(c.end) < pd(c.start)){ $("warnTxt").textContent = "A data final precisa ser depois da inicial."; $("warnYes").hidden = true; $("warn").hidden = false; nextCfg = null; return; }
+    var bad = false;
+    if(!(c.goal>=100)){ setErr("cGoal","cGoalErr","Informe uma meta de pelo menos R$ 100."); bad = true; } else setErr("cGoal","cGoalErr","");
+    if(!c.start || !c.end){ setErr("cEnd","cEndErr","Preencha as duas datas."); bad = true; }
+    else if(pd(c.end) <= pd(c.start)){ setErr("cEnd","cEndErr","A data final precisa ser depois da inicial."); bad = true; }
+    else setErr("cEnd","cEndErr","");
+    if(bad){ var first = document.querySelector("#cfgForm .invalid"); if(first) first.focus(); return; }
     $("warnYes").hidden = false;
     var willReset = (c.goal !== state.goal || c.mode !== state.mode) && state.done.length > 0;
     if(willReset){

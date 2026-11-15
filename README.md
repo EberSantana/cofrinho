@@ -16,6 +16,8 @@ Sistema web de economia no formato de **desafio de cartela**: o usuário define 
 - **Filtros da cartela**: todos, pendentes ou guardados.
 - **Depósitos extras**: registro de valores fora da cartela (13º, bônus, vendas), com histórico.
 - **Configuração livre**: meta, data de início, data final e modelo.
+- **Gráfico de evolução**: saldo guardado contra o previsto pelo calendário, com tabela equivalente.
+- **Avisos com desfazer**: marcar, desmarcar e remover depósitos podem ser desfeitos na hora; marcos de progresso são celebrados.
 - **Backup**: exportação e importação dos dados em arquivo JSON.
 - **Tema claro e escuro** automáticos e layout responsivo para celular.
 
@@ -33,6 +35,10 @@ Todos os dados ficam **apenas no navegador** do usuário (`localStorage`). Nada 
 ## Tecnologia
 
 Página única em HTML, CSS e JavaScript puro, sem dependências nem etapa de build. Para rodar localmente, basta abrir o `index.html`.
+
+## Design
+
+O sistema visual e as regras de UX estão em [`design-system/cofrinho/MASTER.md`](design-system/cofrinho/MASTER.md).
 
 ## Autor
 
