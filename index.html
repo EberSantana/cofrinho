@@ -246,7 +246,17 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--brand);min-heigh
 .ios-tip{margin:0;padding:14px 16px;border:1px dashed var(--line);border-radius:14px;color:var(--muted);font-size:14px;background:var(--surface)}
 .ios-tip b{color:var(--ink)}
 .wrap{padding-bottom:calc(56px + env(safe-area-inset-bottom))}
-@media print{.toast,.ios-tip{display:none}}
+.warnbar{display:flex;gap:14px;justify-content:space-between;align-items:center;flex-wrap:wrap;background:var(--warn-soft);border-color:color-mix(in srgb,var(--warn) 30%,transparent);padding:16px 20px}
+.warnbar p{margin:0;font-weight:600;font-size:14px;max-width:62ch}
+.warnbar .acts,.dacts{display:flex;gap:8px;flex-wrap:wrap}
+.kv{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column}
+.kv li{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--line);font-size:14px}
+.kv li:last-child{border-bottom:0}
+.kv span:first-child{color:var(--muted);font-weight:600}
+.kv b{text-align:right;font-weight:700}
+.kv b.ok{color:var(--ok)}
+.kv b.no{color:var(--warn)}
+@media print{.toast,.ios-tip,.warnbar,#dataCard{display:none}}
 @media print{.nav,.foot,#cfgCard,#exForm,.seg{display:none}body{background:#fff}.card,.hcard,.kpi{box-shadow:none}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -311,6 +321,11 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--brand);min-heigh
     </ol>
   </section>
 
+  <section class="card warnbar" id="bkBanner" aria-label="Lembrete de backup" hidden>
+    <p id="bkBannerTxt">Faça um backup dos seus dados para não perder o progresso.</p>
+    <span class="acts"><button class="btn sm" id="bkNow" type="button">Fazer backup agora</button><button class="btn ghost sm" id="bkLater" type="button">Depois</button></span>
+  </section>
+
   <section class="card" aria-label="Linha do tempo">
     <div class="head"><div><h2>Caminho até a meta</h2><p>A marca “hoje” mostra onde você deveria estar pelo calendário.</p></div></div>
     <div class="track" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="bar"><span id="barFill" style="width:0%"></span><i class="exp" id="barExp" style="left:0%"></i></div>
@@ -370,6 +385,19 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--brand);min-heigh
     <div class="warn" id="warn" hidden>
       <span id="warnTxt"></span>
       <span style="display:flex;gap:8px"><button class="btn danger sm" id="warnYes" type="button">Sim, gerar nova</button><button class="btn ghost sm" id="warnNo" type="button">Cancelar</button></span>
+    </div>
+  </section>
+
+  <section class="card" id="dataCard" aria-label="Seus dados">
+    <div class="head"><div><h2>Seus dados</h2><p>Ficam só neste dispositivo. Um backup em arquivo é a forma segura de nunca perdê-los.</p></div></div>
+    <ul class="kv">
+      <li><span>Último backup</span><b id="kvBk">Nunca</b></li>
+      <li><span>Proteção contra limpeza</span><b id="kvPersist">Verificando…</b></li>
+      <li><span>Modo de uso</span><b id="kvMode">No navegador</b></li>
+    </ul>
+    <div class="dacts">
+      <button class="btn" id="bkExp2" type="button">Salvar backup</button>
+      <label class="btn ghost" for="bkImp2" style="cursor:pointer;color:var(--ink);font-size:14px">Restaurar de um arquivo<input id="bkImp2" type="file" accept="application/json,.json" hidden></label>
     </div>
   </section>
 
@@ -504,7 +532,7 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--brand);min-heigh
     });
     $("histInfo").textContent = state.extras.length ? state.extras.length + (state.extras.length===1?" depósito":" depósitos") + " · " + fmt(t.extra) : "Os quadrados da cartela contam automaticamente.";
     $("hist").innerHTML = h || '<li class="empty" style="border:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h3"/></svg>Nenhum depósito extra ainda.</li>';
-    renderIntro(); drawChart(t);
+    renderIntro(); drawChart(t); renderData();
   }
 
   /* ---------- gráfico de evolução ---------- */
@@ -553,7 +581,31 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--brand);min-heigh
   function esc(s){ return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
 
   /* ---------- persistência ---------- */
-  function persist(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){} }
+  var askedPersist = false, persisted = false;
+  function idb(mode, fn){
+    return new Promise(function(res){
+      try{
+        var rq = indexedDB.open("cofrinho", 1);
+        rq.onupgradeneeded = function(){ rq.result.createObjectStore("kv"); };
+        rq.onerror = function(){ res(null); };
+        rq.onsuccess = function(){
+          try{ var tx = rq.result.transaction("kv", mode), st = tx.objectStore("kv"), r = fn(st);
+            tx.oncomplete = function(){ res(r && r.result !== undefined ? r.result : true); rq.result.close(); };
+            tx.onerror = tx.onabort = function(){ res(null); };
+          }catch(e){ res(null); }
+        };
+      }catch(e){ res(null); }
+    });
+  }
+  function persist(){
+    state.updatedAt = Date.now();
+    try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){}
+    idb("readwrite", function(st){ return st.put(JSON.parse(JSON.stringify(state)), "state"); });
+    if(!askedPersist && navigator.storage && navigator.storage.persist){
+      askedPersist = true;
+      navigator.storage.persist().then(function(ok){ persisted = !!ok; renderData(); }).catch(function(){});
+    }
+  }
   function normalize(d){
     var b = defaults();
     if(!d || typeof d !== "object") return b;
@@ -563,6 +615,8 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--brand);min-heigh
     if(Array.isArray(d.done)) b.done = d.done.filter(function(i){return Number.isInteger(i)&&i>=0;});
     if(d.dates && typeof d.dates === "object") Object.keys(d.dates).forEach(function(k){ if(/^\d{4}-\d{2}-\d{2}$/.test(d.dates[k]||"")) b.dates[k] = d.dates[k]; });
     b.introDismissed = d.introDismissed === true;
+    if(typeof d.updatedAt === "number") b.updatedAt = d.updatedAt;
+    ["lastBackup","bkSnooze"].forEach(function(k){ if(/^\d{4}-\d{2}-\d{2}$/.test(d[k]||"")) b[k] = d[k]; });
     if(Array.isArray(d.extras)) b.extras = d.extras.filter(function(x){return x && typeof x.value==="number" && x.value>0;}).map(function(x){return {id:x.id||Date.now(),date:/^\d{4}-\d{2}-\d{2}$/.test(x.date||"")?x.date:iso(today()),value:x.value,note:String(x.note||"").slice(0,60)};});
     return b;
   }
@@ -674,24 +728,65 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--brand);min-heigh
   $("warnNo").addEventListener("click", function(){ nextCfg = null; $("warn").hidden = true; fillCfg(); });
 
   /* ---------- início ---------- */
-  try{ var raw = localStorage.getItem(LS_KEY); if(raw) state = normalize(JSON.parse(raw)); }catch(e){}
+  var hadLocal = false;
+  try{ var raw = localStorage.getItem(LS_KEY); if(raw){ state = normalize(JSON.parse(raw)); hadLocal = true; } }catch(e){}
   fillCfg(); render();
-
-  $("bkExp").addEventListener("click", function(){
-    var blob = new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
-    var a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-    a.download = "cofrinho-backup-"+iso(today())+".json"; document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+  idb("readonly", function(st){ return st.get("state"); }).then(function(d){
+    if(d && typeof d === "object" && d.goal){
+      var n = normalize(d);
+      if(!hadLocal || (n.updatedAt||0) > (state.updatedAt||0)){
+        state = n; try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){}
+        fillCfg(); render(); if(!hadLocal) toast("Dados recuperados.");
+      }
+    } else if(hadLocal){ idb("readwrite", function(st){ return st.put(JSON.parse(JSON.stringify(state)), "state"); }); }
   });
-  $("bkImp").addEventListener("change", function(ev){
-    var f = ev.target.files[0]; if(!f) return;
+  if(navigator.storage && navigator.storage.persisted) navigator.storage.persisted().then(function(p){ persisted = !!p; renderData(); }).catch(function(){});
+
+  function daysSince(str){ return Math.floor((today() - pd(str))/DAY); }
+  function markBackup(){ state.lastBackup = iso(today()); state.bkSnooze = ""; delete state.bkSnooze; persist(); renderData(); }
+  function downloadFile(file){
+    var a = document.createElement("a"); a.href = URL.createObjectURL(file); a.download = file.name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+  }
+  function doExport(){
+    var d = JSON.parse(JSON.stringify(state)); d.lastBackup = iso(today()); delete d.bkSnooze;
+    var name = "cofrinho-backup-" + iso(today()) + ".json", json = JSON.stringify(d, null, 2), file;
+    try{ file = new File([json], name, {type:"application/json"}); }catch(e){ file = new Blob([json], {type:"application/json"}); file.name = name; }
+    var canShare = false;
+    try{ canShare = !!(navigator.canShare && file instanceof File && navigator.canShare({files:[file]})); }catch(e){}
+    if(canShare){
+      navigator.share({files:[file], title:"Backup do Cofrinho"}).then(function(){ markBackup(); toast("Backup salvo."); })
+        .catch(function(err){ if(!err || err.name !== "AbortError"){ downloadFile(file); markBackup(); toast("Backup baixado."); } });
+    } else { downloadFile(file); markBackup(); toast("Backup baixado."); }
+  }
+  function importFile(f){
+    if(!f) return;
     var r = new FileReader();
     r.onload = function(){
-      try{ var d = JSON.parse(r.result); if(!d || typeof d.goal !== "number") throw 0; state = normalize(d); persist(); fillCfg(); render(); }
+      try{ var d = JSON.parse(r.result); if(!d || typeof d.goal !== "number") throw 0; state = normalize(d); persist(); fillCfg(); render(); renderData(); toast("Backup restaurado."); }
       catch(e){ $("warnTxt").textContent = "Arquivo inválido. Use um backup exportado por este app."; $("warnYes").hidden = true; $("warn").hidden = false; nextCfg = null; }
     };
-    r.readAsText(f); ev.target.value = "";
-  });
+    r.readAsText(f);
+  }
+  $("bkExp").addEventListener("click", doExport);
+  $("bkExp2").addEventListener("click", doExport);
+  $("bkNow").addEventListener("click", doExport);
+  $("bkLater").addEventListener("click", function(){ var d = today(); d.setDate(d.getDate()+7); state.bkSnooze = iso(d); persist(); renderData(); });
+  ["bkImp","bkImp2"].forEach(function(id){ $(id).addEventListener("change", function(ev){ importFile(ev.target.files[0]); ev.target.value = ""; }); });
+
+  function renderData(){
+    var has = state.done.length > 0 || state.extras.length > 0, ds = state.lastBackup ? daysSince(state.lastBackup) : null;
+    $("kvBk").textContent = state.lastBackup ? brDate(state.lastBackup) + (ds===0 ? " (hoje)" : ds===1 ? " (ontem)" : " (há " + ds + " dias)") : "Nunca";
+    $("kvBk").className = state.lastBackup && ds <= 14 ? "ok" : (has ? "no" : "");
+    $("kvPersist").textContent = persisted ? "Ativa" : "Padrão do navegador";
+    $("kvPersist").className = persisted ? "ok" : "";
+    $("kvMode").textContent = (window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true) ? "Instalado como app" : "No navegador";
+    var snoozed = state.bkSnooze && today() <= pd(state.bkSnooze);
+    var due = has && (ds === null || ds > 14) && !snoozed;
+    $("bkBanner").hidden = !due;
+    if(due) $("bkBannerTxt").textContent = ds === null ? "Você ainda não fez backup. Salve um arquivo para não perder o progresso se o navegador limpar os dados." : "Seu último backup foi há " + ds + " dias. Salve um novo para manter o progresso seguro.";
+  }
 
 })();
 
