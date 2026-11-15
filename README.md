@@ -29,9 +29,32 @@ Sistema web de economia no formato de **desafio de cartela**: o usuário define 
 3. Acompanhe o ritmo e o valor semanal sugerido no painel superior.
 4. Registre depósitos extras na seção própria.
 
+## Sincronização na nuvem (opcional)
+
+Por padrão os dados ficam **apenas no dispositivo**. Para guardá-los na sua conta e usar em vários aparelhos, o app pode sincronizar com o **Firebase** (Authentication + Firestore, camada gratuita). Sem a configuração abaixo, o cartão de nuvem fica oculto e nada sai do aparelho.
+
+### Como ativar
+
+1. Em https://console.firebase.google.com crie um projeto (pode desativar o Google Analytics).
+2. **Authentication → Sign-in method:** ative **Google** e **E-mail/senha**. Em **Settings → Authorized domains**, adicione `ebersantana.github.io`.
+3. **Firestore Database → Criar banco de dados** (modo produção, região `southamerica-east1`).
+4. **Firestore → Regras:** cole o conteúdo de [`firestore.rules`](firestore.rules) e publique. Cada pessoa só lê e grava o próprio documento.
+5. **Configurações do projeto → Seus apps → Web (`</>`):** registre o app e copie o objeto `firebaseConfig`.
+6. Cole esse objeto em [`firebase-config.js`](firebase-config.js), no lugar de `null`, e faça o commit. Aumente o `CACHE` em `sw.js` para os aparelhos pegarem a versão nova.
+
+Os valores do `firebaseConfig` são públicos por design; a proteção dos dados está nas regras do Firestore.
+
+### Como funciona
+
+- O app continua **local primeiro**: funciona offline e sem login. A nuvem é uma cópia sincronizada.
+- Ao entrar pela primeira vez em um aparelho que já tem dados diferentes dos da nuvem, o app pergunta qual versão manter.
+- Depois disso, vence a alteração mais recente, e as mudanças de outro aparelho chegam em tempo real.
+- Sair da conta não apaga os dados do aparelho.
+- O **backup em arquivo** continua disponível como segunda garantia.
+
 ## Privacidade e segurança dos dados
 
-Todos os dados ficam **apenas no dispositivo** do usuário. Nada é enviado a servidores. Para reduzir o risco de perda:
+Sem login, nada é enviado a servidores. Para reduzir o risco de perda local:
 
 - **Cópia dupla:** cada alteração é gravada em `localStorage` e também em IndexedDB. Se um deles for apagado, o app recupera os dados do outro.
 - **Armazenamento protegido:** o app pede ao navegador que não apague os dados automaticamente.
@@ -39,11 +62,11 @@ Todos os dados ficam **apenas no dispositivo** do usuário. Nada é enviado a se
 - **Restauração:** **Restaurar de um arquivo** recupera tudo, inclusive em outro aparelho.
 - **Lembrete:** se houver dados e o último backup tiver mais de 14 dias (ou nunca tiver sido feito), o app avisa no topo.
 
-Ainda assim, limpar os dados do navegador, trocar de aparelho ou usar o app instalado e o navegador separadamente pode resultar em armazenamentos distintos. O backup em arquivo é a garantia.
+Com login, os dados também ficam no Firestore, na conta Google do projeto Firebase do administrador do site, protegidos pelas regras acima.
 
 ## Tecnologia
 
-Página única em HTML, CSS e JavaScript puro, sem dependências nem etapa de build, mais `manifest.webmanifest`, `sw.js` e a pasta `icons/` do PWA. Para rodar localmente, sirva a pasta com qualquer servidor estático (por exemplo `python3 -m http.server`); abrir o `index.html` direto também funciona, só sem o modo offline.
+Página única em HTML, CSS e JavaScript puro, sem dependências nem etapa de build, mais `manifest.webmanifest`, `sw.js` e a pasta `icons/` do PWA. A sincronização usa o SDK web do Firebase carregado sob demanda (`sync.js`). Para rodar localmente, sirva a pasta com qualquer servidor estático (por exemplo `python3 -m http.server`); abrir o `index.html` direto também funciona, só sem o modo offline.
 
 ## Instalar no celular
 

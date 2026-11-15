@@ -256,7 +256,12 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--brand);min-heigh
 .kv b{text-align:right;font-weight:700}
 .kv b.ok{color:var(--ok)}
 .kv b.no{color:var(--warn)}
-@media print{.toast,.ios-tip,.warnbar,#dataCard{display:none}}
+.or{margin:16px 0 12px;color:var(--muted);font-size:13px;font-weight:600}
+.cform{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.cform .dacts{grid-column:1/-1}
+@media (max-width:600px){.cform{grid-template-columns:minmax(0,1fr)}}
+#cloudErr{margin-top:12px}
+@media print{.toast,.ios-tip,.warnbar,#dataCard,#cloudCard{display:none}}
 @media print{.nav,.foot,#cfgCard,#exForm,.seg{display:none}body{background:#fff}.card,.hcard,.kpi{box-shadow:none}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -271,7 +276,7 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--brand);min-heigh
     </a>
     <div class="nav-acts">
       <button class="btn sm" id="btnInstall" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M12 8v6M9 11l3 3 3-3"/></svg><span class="bt">Instalar</span></button>
-      <span class="chip-safe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg><span>Dados só neste dispositivo</span></span>
+      <span class="chip-safe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg><span id="chipTxt">Dados só neste dispositivo</span></span>
       <button class="btn ghost sm" id="bkExp" type="button" aria-label="Exportar backup" title="Exportar backup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg><span class="bt">Backup</span></button>
       <label class="btn ghost sm" for="bkImp" title="Restaurar backup" aria-label="Restaurar backup" style="flex-direction:row;font-size:13px;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21V9M7 14l5-5 5 5M5 3h14"/></svg><span class="bt">Restaurar</span><input id="bkImp" type="file" accept="application/json,.json" hidden></label>
     </div>
@@ -388,6 +393,28 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--brand);min-heigh
     </div>
   </section>
 
+  <section class="card" id="cloudCard" aria-label="Sincronização na nuvem" hidden>
+    <div class="head"><div><h2>Sincronização na nuvem</h2><p id="cloudDesc">Entre para guardar seus dados na sua conta e usar em vários aparelhos.</p></div></div>
+    <div id="cloudOut">
+      <div class="dacts"><button class="btn" id="cGoogle" type="button">Entrar com Google</button></div>
+      <p class="or">ou use e-mail e senha</p>
+      <form class="cform" id="cloudForm" novalidate>
+        <label for="cEmail">E-mail<input id="cEmail" type="email" autocomplete="email" inputmode="email"></label>
+        <label for="cPass">Senha<input id="cPass" type="password" autocomplete="current-password"></label>
+        <div class="dacts"><button class="btn ghost" id="cSignIn" type="submit">Entrar</button><button class="btn ghost" id="cSignUp" type="button">Criar conta</button></div>
+      </form>
+    </div>
+    <p class="err" id="cloudErr" role="alert" hidden></p>
+    <div id="cloudIn" hidden>
+      <ul class="kv"><li><span>Conta</span><b id="cUser"></b></li><li><span>Última sincronização</span><b id="cLast">—</b></li></ul>
+      <div class="dacts"><button class="btn ghost" id="cOut" type="button">Sair da conta</button></div>
+    </div>
+    <div class="warn" id="cConflict" hidden>
+      <span id="cConflictTxt"></span>
+      <span style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn sm" id="cUseCloud" type="button">Usar a nuvem</button><button class="btn ghost sm" id="cUseLocal" type="button">Usar este aparelho</button></span>
+    </div>
+  </section>
+
   <section class="card" id="dataCard" aria-label="Seus dados">
     <div class="head"><div><h2>Seus dados</h2><p>Ficam só neste dispositivo. Um backup em arquivo é a forma segura de nunca perdê-los.</p></div></div>
     <ul class="kv">
@@ -409,6 +436,7 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--brand);min-heigh
 </main>
 <div class="toast" id="toast" role="status" aria-live="polite"><span id="toastMsg"></span><button type="button" id="toastBtn"></button></div>
 
+<script src="firebase-config.js"></script>
 <script>
 (function(){
   var LS_KEY = "cofre2027.v1";
@@ -601,6 +629,7 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--brand);min-heigh
     state.updatedAt = Date.now();
     try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){}
     idb("readwrite", function(st){ return st.put(JSON.parse(JSON.stringify(state)), "state"); });
+    if(window.cofrinhoApp && window.cofrinhoApp.onChange) window.cofrinhoApp.onChange();
     if(!askedPersist && navigator.storage && navigator.storage.persist){
       askedPersist = true;
       navigator.storage.persist().then(function(ok){ persisted = !!ok; renderData(); }).catch(function(){});
@@ -728,6 +757,23 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--brand);min-heigh
   $("warnNo").addEventListener("click", function(){ nextCfg = null; $("warn").hidden = true; fillCfg(); });
 
   /* ---------- início ---------- */
+  function totalsFor(st){
+    var vals = buildValues(st), g = 0;
+    st.done.forEach(function(i){ if(vals[i]!=null) g += vals[i]; });
+    return {saved: g + st.extras.reduce(function(a,e){ return a+e.value; },0), done: st.done.length, extras: st.extras.length};
+  }
+  function writeLocal(){
+    try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){}
+    idb("readwrite", function(st){ return st.put(JSON.parse(JSON.stringify(state)), "state"); });
+  }
+  window.cofrinhoApp = {
+    onChange: null,
+    getState: function(){ return JSON.parse(JSON.stringify(state)); },
+    summary: function(d){ return totalsFor(normalize(d)); },
+    replaceState: function(d){ state = normalize(d); writeLocal(); fillCfg(); render(); },
+    touch: function(){ state.updatedAt = Date.now(); writeLocal(); },
+    toast: toast
+  };
   var hadLocal = false;
   try{ var raw = localStorage.getItem(LS_KEY); if(raw){ state = normalize(JSON.parse(raw)); hadLocal = true; } }catch(e){}
   fillCfg(); render();
@@ -791,5 +837,6 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--brand);min-heigh
 })();
 
 </script>
+<script type="module" src="sync.js"></script>
 </body>
 </html>

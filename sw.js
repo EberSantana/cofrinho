@@ -1,7 +1,7 @@
 /* Cofrinho · service worker: abre offline depois da primeira visita.
    Para publicar uma nova versão do app, aumente CACHE. */
-var CACHE = "cofrinho-v1";
-var SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/maskable-512.png", "./icons/apple-touch-icon.png"];
+var CACHE = "cofrinho-v2";
+var SHELL = ["./", "./index.html", "./manifest.webmanifest", "./firebase-config.js", "./sync.js", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/maskable-512.png", "./icons/apple-touch-icon.png"];
 
 self.addEventListener("install", function(e){
   e.waitUntil(caches.open(CACHE).then(function(c){ return c.addAll(SHELL); }).then(function(){ return self.skipWaiting(); }));
