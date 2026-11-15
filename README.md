@@ -18,6 +18,7 @@ Sistema web de economia no formato de **desafio de cartela**: o usuário define 
 - **Configuração livre**: meta, data de início, data final e modelo.
 - **Gráfico de evolução**: saldo guardado contra o previsto pelo calendário, com tabela equivalente.
 - **Avisos com desfazer**: marcar, desmarcar e remover depósitos podem ser desfeitos na hora; marcos de progresso são celebrados.
+- **App instalável (PWA)**: pode ser adicionado à tela inicial do celular, abre em tela cheia e funciona sem internet depois da primeira visita.
 - **Backup**: exportação e importação dos dados em arquivo JSON.
 - **Tema claro e escuro** automáticos e layout responsivo para celular.
 
@@ -34,7 +35,14 @@ Todos os dados ficam **apenas no navegador** do usuário (`localStorage`). Nada 
 
 ## Tecnologia
 
-Página única em HTML, CSS e JavaScript puro, sem dependências nem etapa de build. Para rodar localmente, basta abrir o `index.html`.
+Página única em HTML, CSS e JavaScript puro, sem dependências nem etapa de build, mais `manifest.webmanifest`, `sw.js` e a pasta `icons/` do PWA. Para rodar localmente, sirva a pasta com qualquer servidor estático (por exemplo `python3 -m http.server`); abrir o `index.html` direto também funciona, só sem o modo offline.
+
+## Instalar no celular
+
+- **iPhone (Safari):** toque em Compartilhar e depois em **Adicionar à Tela de Início**.
+- **Android (Chrome):** toque em **Instalar** no topo do app, ou no menu do navegador em **Instalar app**.
+
+Para publicar uma nova versão do app, aumente o valor de `CACHE` em `sw.js`; assim os aparelhos baixam os arquivos novos.
 
 ## Design
 

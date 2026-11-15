@@ -2,10 +2,17 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Cofrinho · Desafio de economia</title>
 <meta name="description" content="Desafio de economia em cartela: defina sua meta, marque cada depósito e acompanhe seu progresso. Gratuito, sem cadastro, dados só no seu dispositivo.">
 <meta name="theme-color" content="#0b2a22">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Cofrinho">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta property="og:title" content="Cofrinho · Desafio de economia">
 <meta property="og:description" content="Defina sua meta, marque cada depósito na cartela e acompanhe o ritmo até o fim do prazo.">
 <meta property="og:type" content="website">
@@ -52,7 +59,8 @@ h2{font-size:18px;font-weight:600}
 
 /* barra superior */
 .nav{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:saturate(1.4) blur(12px);-webkit-backdrop-filter:saturate(1.4) blur(12px);border-bottom:1px solid var(--line)}
-.nav-in{max-width:1120px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.nav{padding-top:env(safe-area-inset-top)}
+.nav-in{max-width:1120px;margin:0 auto;padding:12px max(20px,env(safe-area-inset-right)) 12px max(20px,env(safe-area-inset-left));display:flex;align-items:center;justify-content:space-between;gap:12px}
 .brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:-.02em;color:var(--ink);text-decoration:none}
 .brand svg{width:32px;height:32px;flex:none}
 .nav-acts{display:flex;gap:8px;align-items:center}
@@ -235,7 +243,10 @@ details.more{margin-top:14px;font-size:14px}
 details.more summary{cursor:pointer;font-weight:700;color:var(--brand);min-height:44px;display:flex;align-items:center}
 @media (pointer:coarse){.btn.sm{min-height:44px;min-width:44px}.x{min-width:44px;min-height:44px}.seg button{min-height:44px}}
 @media (max-width:600px){.steps{grid-template-columns:1fr}}
-@media print{.toast{display:none}}
+.ios-tip{margin:0;padding:14px 16px;border:1px dashed var(--line);border-radius:14px;color:var(--muted);font-size:14px;background:var(--surface)}
+.ios-tip b{color:var(--ink)}
+.wrap{padding-bottom:calc(56px + env(safe-area-inset-bottom))}
+@media print{.toast,.ios-tip{display:none}}
 @media print{.nav,.foot,#cfgCard,#exForm,.seg{display:none}body{background:#fff}.card,.hcard,.kpi{box-shadow:none}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -249,6 +260,7 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--brand);min-heigh
       Cofrinho
     </a>
     <div class="nav-acts">
+      <button class="btn sm" id="btnInstall" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M12 8v6M9 11l3 3 3-3"/></svg><span class="bt">Instalar</span></button>
       <span class="chip-safe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg><span>Dados só neste dispositivo</span></span>
       <button class="btn ghost sm" id="bkExp" type="button" aria-label="Exportar backup" title="Exportar backup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg><span class="bt">Backup</span></button>
       <label class="btn ghost sm" for="bkImp" title="Restaurar backup" aria-label="Restaurar backup" style="flex-direction:row;font-size:13px;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21V9M7 14l5-5 5 5M5 3h14"/></svg><span class="bt">Restaurar</span><input id="bkImp" type="file" accept="application/json,.json" hidden></label>
@@ -361,6 +373,7 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--brand);min-heigh
     </div>
   </section>
 
+  <p class="ios-tip" id="iosTip" hidden>Para instalar no iPhone: toque em <b>Compartilhar</b> e depois em <b>Adicionar à Tela de Início</b>.</p>
   <footer class="foot">
     <span>© Cofrinho · Prof. Eber Santana</span>
     <a href="https://www.instagram.com/prof.ebersantana/">@prof.ebersantana</a>
@@ -555,6 +568,21 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--brand);min-heigh
   }
 
   /* ---------- eventos ---------- */
+  /* ---------- PWA: instalação e offline ---------- */
+  if("serviceWorker" in navigator && location.protocol !== "file:"){
+    window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); });
+  }
+  var installEv = null, standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); installEv = e; if(!standalone) $("btnInstall").hidden = false; });
+  $("btnInstall").addEventListener("click", function(){
+    if(!installEv) return;
+    installEv.prompt();
+    installEv.userChoice.then(function(){ installEv = null; $("btnInstall").hidden = true; }).catch(function(){});
+  });
+  window.addEventListener("appinstalled", function(){ $("btnInstall").hidden = true; toast("Cofrinho instalado."); });
+  var ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  if(ios && !standalone) $("iosTip").hidden = false;
+
   /* ---------- aviso (toast) com desfazer ---------- */
   var toastTimer = null, toastUndo = null;
   function toast(msg, undoFn){
